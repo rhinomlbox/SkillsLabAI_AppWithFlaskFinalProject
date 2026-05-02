@@ -1,0 +1,25 @@
+"""
+Emotion Predict function of Watson NLP Library:
+URL: 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict'
+Headers: {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
+Input json: { "raw_document": { "text": text_to_analyze } }
+"""
+# Import the requests library to handle HTTP requests
+import json
+import requests
+
+def emotion_analyzer(text_to_analyse):
+    '''
+    use Watson NLP library for emotion analysis
+    '''
+    # url for emotion detector service
+    url = 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict' # pylint: disable=line-too-long
+    # Create a dictionary with the text to be analyzed
+    myobj = { "raw_document": { "text": text_to_analyse } }
+    # Send a POST request to the API with the text and headers
+    header = {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
+    response = requests.post(url, json = myobj, headers=header, timeout=(3.05, 27))
+    response_json = json.loads(response.text)
+    emotions = response_json['emotionPredictions'][0]['emotion']
+    emotions['dominant_emotion'] = max(emotions, key=emotions.get)
+    return emotions
